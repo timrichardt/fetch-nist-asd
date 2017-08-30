@@ -1,14 +1,29 @@
 # fetch-nist-asd
 
-A Clojure library designed to ... well, that part is up to you.
+This is a collection of Clojure functions to access the line data
+of the [Atomic Spectra Database Version 5](https://www.nist.gov/pml/atomic-spectra-database) of the [NIST](https://www.nist.gov).
 
-## Usage
+An index of all accessible data is available under
 
-FIXME
+```
+http://physics.nist.gov/cgi-bin/ASD/lines_pt.pl
+```
+
+and the line data itself are accessed through
+
+```
+http://physics.nist.gov/cgi-bin/ASD/lines1.pl
+```
+
+via a `GET` request.
+
+The query parameters are documented in the [fetch](src/fetch_nist_asd/fetch.clj)
+namespace.
+
+The line data is returned in form of a ASCII table. Functions
+to parse some of the data from the table can be found in the
+namespace [parse](src/fetch_nist_asd/fetch.clj).
 
 ## License
 
-Copyright © 2017 FIXME
-
-Distributed under the Eclipse Public License either version 1.0 or (at
-your option) any later version.
+[MIT](https://opensource.org/licenses/MIT)
