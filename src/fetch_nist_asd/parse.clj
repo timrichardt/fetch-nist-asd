@@ -43,7 +43,7 @@
   "Given a NIST ASD ASCII table, returns observed lines in
   nm."
   [ascii]
-  (->> (split ascii #"\n")
+  (->> (clojure.string/split ascii #"\n")
        (map observed-line)
        (filter identity)
        Double/parseDouble))
@@ -60,7 +60,7 @@
   "Given an ASCII table without the Ritz wavelenghts, returns
   a list of observed lines with relative intensity."
   [ascii]
-  (->> (split ascii #"\n")
+  (->> (clojure.string/split ascii #"\n")
        (map relint-line)
        (filter identity)))
 
