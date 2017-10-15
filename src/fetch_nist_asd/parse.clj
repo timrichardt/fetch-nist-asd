@@ -1,4 +1,6 @@
-(ns fetch-nist-asd.parse)
+(ns fetch-nist-asd.parse
+  (:require [fetch-nist-asd.fetch :refer [index]]
+            [clojure.java.io]))
 
 (def relint-descriptors
   "Table of the descriptors sometimes added to lines where
@@ -77,4 +79,17 @@
                   (str l "," i)))
            (interpose "\n")
            (apply str)
-           (write csv-path)))))
+           (write csv-path))))
+
+  (with-open [w (clojure.java.io/writer "/home/tim/data.clj")]
+    (.write w
+            (prn-str
+             (for [{:keys [Z element numeral] :as ion} (index)]
+               (let [home "/home/tim/src/nist-asd-clj/resources"
+                     ascii-path (format "%s/nist-asd-data/lines/%03d-%s-%s.txt" home Z element numeral)
+                     lines (as-> ascii-path _
+                             (slurp _)
+                             (clojure.string/split _ #",")
+                             (filter (comp not empty?) _)
+                             (map #(Double/parseDouble %) _))]
+                 (merge ion {:lines lines})))))))
