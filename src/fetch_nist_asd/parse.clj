@@ -66,7 +66,9 @@
        (map relint-line)
        (filter identity)))
 
+
 (comment
+  ;; Write lines with relative intensity per ion into some directory
   (doseq [{:keys [Z element numeral]} (index)]
     (let [home "/home/tim/src/nist-asd-clj/resources"
           ascii-path (format "%s/ascii-tables-relint/%03d-%s-%s.txt" home Z element numeral)
@@ -81,6 +83,7 @@
            (apply str)
            (write csv-path))))
 
+  ;; Write lines with relative intensity into a clojure data structure
   (with-open [w (clojure.java.io/writer "/home/tim/data.clj")]
     (.write w
             (prn-str

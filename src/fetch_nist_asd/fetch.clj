@@ -33,27 +33,27 @@
 
 (def ^:dynamic *parameters*
   "Parameter map for the line data request."
-  {"unit"           "1"    ;; wavelenghts in nm
-   "bibrefs"        "0"    ;; references
-   "show_obs_wl"    "1"    ;; observed wavelenghts
-   "show_calc_wl"   "0"    ;; theoretical wavelenghts
-   "A_out"          "0"    ;; ?
-   "format"         "1"    ;; ascii format
-   "remove_js"      "on"   ;; ?
-   "output"         "0"    ;; ?
-   "page_size"      "15"   ;; 0 all at once, 1 paginate
-   "line_out"       "1"    ;; 0 return all lines, 1 only w/trans probs, 2 only w/egy levl, 3 only w/obs wls
-   "order_out"      "0"    ;; output ordering: 0 wavelength, 1 multiplet
-   "show_av"        "2"    ;; show wl in Vacuum (<2000A) Air (2000-20000A) Vacuum (>20,000A)
-   "max_low_enrg"   ""     ;; maximum lower level energy
-   "max_upp_enrg"   ""     ;; maximum upper level energy
-   "min_str"        ""     ;; minimum transition strength
-   "max_str"        ""     ;; maximum transition strength
-   "min_accur"      ""     ;; minimum line accuracy, eg AAA AA A B C
-   "min_intens"     ""     ;; minimum relative intensity to return
-   "intens_out"     "on"   ;; show relative intensity
-   "allowed_out"    "1"    ;; show allowed transitions
-   "forbid_out"     "1"    ;; show forbidden transitions
+  {"unit"           "1"     ;; wavelenghts in nm
+   "bibrefs"        "0"     ;; references
+   "show_obs_wl"    "1"     ;; observed wavelenghts
+   "show_calc_wl"   "0"     ;; theoretical wavelenghts
+   "A_out"          "0"     ;; ?
+   "format"         "1"     ;; ascii format
+   "remove_js"      "on"    ;; ?
+   "output"         "0"     ;; ?
+   "page_size"      "15"    ;; 0 all at once, 1 paginate
+   "line_out"       "1"     ;; 0 return all lines, 1 only w/trans probs, 2 only w/egy levl, 3 only w/obs wls
+   "order_out"      "0"     ;; output ordering: 0 wavelength, 1 multiplet
+   "show_av"        "2"     ;; show wl in Vacuum (<2000A) Air (2000-20000A) Vacuum (>20,000A)
+   "max_low_enrg"   ""      ;; maximum lower level energy
+   "max_upp_enrg"   ""      ;; maximum upper level energy
+   "min_str"        ""      ;; minimum transition strength
+   "max_str"        ""      ;; maximum transition strength
+   "min_accur"      ""      ;; minimum line accuracy, eg AAA AA A B C
+   "min_intens"     ""      ;; minimum relative intensity to return
+   "intens_out"     "on"    ;; show relative intensity
+   "allowed_out"    "1"     ;; show allowed transitions
+   "forbid_out"     "1"     ;; show forbidden transitions
    "conf_out"       "off"   ;; show electron configuration
    "term_out"       "off"   ;; show terms
    "enrg_out"       "off"   ;; show transition energies
@@ -73,10 +73,9 @@
        second)))
 
 (defn write-ascii
-  ""
-  [{:keys [Z element numeral] :as ion}]
-  (let [path (format "/home/tim/src/fetch-nist-asd/resources/ascii-tables-relint/%03d-%s-%s.txt"
-                     Z element numeral)]
+  "Write ASCII-Table to `path`. `path` must contain a trailing /."
+  [{:keys [Z element numeral] :as ion} path]
+  (let [path (format (str path "%03d-%s-%s.txt") Z element numeral)]
     (with-open [w (io/writer path)]
       (println Z element numeral)
       (.write w (or (ascii element numeral) "")))))
