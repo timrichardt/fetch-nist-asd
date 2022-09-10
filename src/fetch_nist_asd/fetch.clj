@@ -6,11 +6,11 @@
 
 (def ^:dynamic *ions-url*
   "URL of available ion data API."
-  "http://physics.nist.gov/cgi-bin/ASD/lines_pt.pl")
+  "https://physics.nist.gov/cgi-bin/ASD/lines_pt.pl")
 
 (def ^:dynamic *lines-url*
   "URL of the line API."
-  "http://physics.nist.gov/cgi-bin/ASD/lines1.pl")
+  "https://physics.nist.gov/cgi-bin/ASD/lines1.pl")
 
 (defn index
   "Retrieve a list of available ions. Each ion is represented
@@ -31,35 +31,43 @@
                  :element element
                  :numeral numeral})))))
 
+
 (def ^:dynamic *parameters*
   "Parameter map for the line data request."
-  {"unit"           "1"     ;; wavelenghts in nm
-   "bibrefs"        "0"     ;; references
-   "show_obs_wl"    "1"     ;; observed wavelenghts
-   "show_calc_wl"   "0"     ;; theoretical wavelenghts
-   "A_out"          "0"     ;; ?
-   "format"         "1"     ;; ascii format
-   "remove_js"      "on"    ;; ?
-   "output"         "0"     ;; ?
-   "page_size"      "15"    ;; 0 all at once, 1 paginate
-   "line_out"       "1"     ;; 0 return all lines, 1 only w/trans probs, 2 only w/egy levl, 3 only w/obs wls
-   "order_out"      "0"     ;; output ordering: 0 wavelength, 1 multiplet
-   "show_av"        "2"     ;; show wl in Vacuum (<2000A) Air (2000-20000A) Vacuum (>20,000A)
-   "max_low_enrg"   ""      ;; maximum lower level energy
-   "max_upp_enrg"   ""      ;; maximum upper level energy
-   "min_str"        ""      ;; minimum transition strength
-   "max_str"        ""      ;; maximum transition strength
-   "min_accur"      ""      ;; minimum line accuracy, eg AAA AA A B C
-   "min_intens"     ""      ;; minimum relative intensity to return
-   "intens_out"     "on"    ;; show relative intensity
-   "allowed_out"    "1"     ;; show allowed transitions
-   "forbid_out"     "1"     ;; show forbidden transitions
-   "conf_out"       "off"   ;; show electron configuration
-   "term_out"       "off"   ;; show terms
-   "enrg_out"       "off"   ;; show transition energies
-   "J_out"          "off"   ;; show J
-   "g_out"          "off"   ;; ?
-   "spectra"        "H I"})
+  {"spectra"      "H+I"     ;; element
+   "limits_type"  "0"
+   "low_w"        ""
+   "upp_w"        ""
+   "unit"         "1"
+   "de"           "0"
+   "format"       "1"       ;; ascii format
+   "line_out"     "0"
+   "remove_js"    "on"
+   "en_unit"      "0"
+   "output"       "0"
+   "bibrefs"      "1"
+   "page_size"    "15"
+   "show_obs_wl"  "1"       ;; observed wavelenghts
+   "show_calc_wl" "1"       ;; theoretical wavelenghts
+   "unc_out"      "1"
+   "order_out"    "0"
+   "max_low_enrg" ""
+   "show_av"      "2"
+   "max_upp_enrg" ""
+   "tsb_value"    "0"
+   "min_str"      ""
+   "max_str"      ""
+   "A_out"        "0"
+   "intens_out"   "on"
+   "allowed_out"  "1"
+   "forbid_out"   "1"
+   "min_accur"    ""        ;; minimum line accuracy, eg AAA AA A B C
+   "min_intens"   ""        ;; minimum relative intensity to return
+   "conf_out"     "on"      ;; show electron configuration
+   "term_out"     "on"      ;; show terms
+   "enrg_out"     "on"      ;; show transition energies
+   "J_out"        "on"      ;; show J
+   })
 
 (defn ascii
   "ASCII Table of an ion."
@@ -79,3 +87,9 @@
     (with-open [w (io/writer path)]
       (println Z element numeral)
       (.write w (or (ascii element numeral) "")))))
+
+
+(comment
+  (let [elements (index)]
+    (doseq [element elements]
+      (write-ascii element "/home/tim/src/spectra/"))))
