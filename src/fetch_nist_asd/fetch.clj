@@ -31,50 +31,108 @@
                  :element element
                  :numeral numeral})))))
 
+;; spectra=H+I
+;; limits_type=0
+;; low_w=
+;; upp_w=
+;; unit=1
+;; de=0
+;; format=1
+;; line_out=0
+;; remove_js=on
+;; en_unit=0
+;; output=0
+;; bibrefs=1
+;; page_size=15
+;; show_obs_wl=1
+;; order_out=0
+;; max_low_enrg=
+;; show_av=2
+;; max_upp_enrg=
+;; tsb_value=0
+;; min_str=
+;; A_out=0
+;; intens_out=on
+;; max_str=
+;; allowed_out=1
+;; forbid_out=1
+;; min_accur=
+;; min_intens=
+;; submit=Retrieve+Data
 
 (def ^:dynamic *parameters*
   "Parameter map for the line data request."
-  {"spectra"      "H+I"     ;; element
-   "limits_type"  "0"
-   "low_w"        ""
-   "upp_w"        ""
-   "unit"         "1"
-   "de"           "0"
-   "format"       "1"       ;; ascii format
-   "line_out"     "0"
-   "remove_js"    "on"
-   "en_unit"      "0"
-   "output"       "0"
-   "bibrefs"      "1"
-   "page_size"    "15"
-   "show_obs_wl"  "1"       ;; observed wavelenghts
-   "show_calc_wl" "1"       ;; theoretical wavelenghts
-   "unc_out"      "1"
-   "order_out"    "0"
-   "max_low_enrg" ""
-   "show_av"      "2"
-   "max_upp_enrg" ""
-   "tsb_value"    "0"
-   "min_str"      ""
-   "max_str"      ""
-   "A_out"        "0"
-   "intens_out"   "on"
-   "allowed_out"  "1"
-   "forbid_out"   "1"
-   "min_accur"    ""        ;; minimum line accuracy, eg AAA AA A B C
-   "min_intens"   ""        ;; minimum relative intensity to return
-   "conf_out"     "on"      ;; show electron configuration
-   "term_out"     "on"      ;; show terms
-   "enrg_out"     "on"      ;; show transition energies
-   "J_out"        "on"      ;; show J
-   })
+  {:spectra "H I"
+   :limits_type "0"
+   :low_w ""
+   :upp_w ""
+   :unit "1"
+   :de "0"
+   :format "1"
+   :line_out "0"
+   :remove_js "on"
+   :en_unit "0"
+   :output "0"
+   :bibrefs "1"
+   :page_size "15"
+   :show_obs_wl "1"
+   :order_out "0"
+   :max_low_enrg ""
+   :show_av "2"
+   :max_upp_enrg ""
+   :tsb_value "0"
+   :min_str ""
+   :A_out "0"
+   :intens_out "on"
+   :max_str ""
+   :allowed_out "1"
+   :forbid_out "1"
+   :min_accur ""
+   :min_intens ""
+   :submit "Retrieve Data"
+   }
+  #_{"spectra"      "H+I"     ;; element
+     "limits_type"  "0"
+     "low_w"        ""
+     "upp_w"        ""
+     "unit"         "1"
+     "de"           "0"
+     "format"       "1"       ;; ascii format
+     ;; "line_out"     "0"
+     "remove_js"    "on"
+     "en_unit"      "0"
+     "output"       "0"
+     ;; "bibrefs"      "1"
+     "page_size"    "15"
+     "show_obs_wl"  "1"       ;; observed wavelenghts
+     "show_calc_wl" "0"       ;; theoretical wavelenghts
+     ;; "unc_out"      "1"
+     ;; "order_out"    "0"
+     ;; "max_low_enrg" ""
+     ;; "show_av"      "2"
+     ;; "max_upp_enrg" ""
+     ;; "tsb_value"    "0"
+     ;; "min_str"      ""
+     ;; "max_str"      ""
+     ;; "A_out"        "0"
+     ;; "intens_out"   "on"
+     "allowed_out"  "1"
+     ;; "forbid_out"   "1"
+     "min_accur"    ""        ;; minimum line accuracy, eg AAA AA A B C
+     "min_intens"   ""        ;; minimum relative intensity to return
+     ;; "conf_out"     "0"      ;; show electron configuration
+     ;; "term_out"     "0"      ;; show terms
+     ;; "enrg_out"     "0"      ;; show transition energies
+     ;; "J_out"        "0"      ;; show J
+     ;; "submit" "Retrieve Data"
+     })
 
 (defn ascii
   "ASCII Table of an ion."
   ([ion] (ascii ion "I"))
   ([ion numeral]
    (-> *lines-url*
-       (http/get {:query-params (assoc *parameters* "spectra" (str ion " " numeral))})
+       (http/get {:query-params (assoc *parameters* :spectra (str ion " " numeral))})
        deref
        :body
        (split #"<pre>|</pre>")
@@ -91,5 +149,5 @@
 
 (comment
   (let [elements (index)]
-    (doseq [element elements]
+    (doseq [element (filter #(= (:numeral %) "I") elements)]
       (write-ascii element "/home/tim/src/spectra/"))))

@@ -1,6 +1,7 @@
 (ns fetch-nist-asd.parse
-  (:require [fetch-nist-asd.fetch :refer [index]]
-            [clojure.java.io]))
+  (:require [clojure.string]
+            [clojure.java.io]
+            [fetch-nist-asd.fetch :refer [index]]))
 
 (def relint-descriptors
   "Table of the descriptors sometimes added to lines where
@@ -38,7 +39,7 @@
 (defn- observed-line
   "Observed number string from line (always the first column)"
   [line]
-  (->> (replace line " " "")
+  (->> (clojure.string/replace line " " "")
        (re-find #"^[0-9]+\.?[0-9]*")))
 
 (defn observed-lines
@@ -48,7 +49,7 @@
   (->> (clojure.string/split ascii #"\n")
        (map observed-line)
        (filter identity)
-       Double/parseDouble))
+       (map #(Double/parseDouble %))))
 
 (defn- relint-line
   "Return a vector with `[wavelength intensity]`"
@@ -67,32 +68,62 @@
        (filter identity)))
 
 
+(defn visible-line?
+  [wl]
+  (<= 380 wl 700))
+
+(defn neutral?
+  [element]
+  (= (:numeral element) "I"))
+
 (comment
   ;; Write lines with relative intensity per ion into some directory
-  (doseq [{:keys [Z element numeral]} (index)]
-    (let [home "/home/tim/src/nist-asd-clj/resources"
-          ascii-path (format "%s/ascii-tables-relint/%03d-%s-%s.txt" home Z element numeral)
-          lines (-> ascii-path
-                    slurp
-                    observed-lines-with-relative-intensity)
-          csv-path (format "%s/lines-relint/%03d-%s-%s.csv" home Z element numeral)]
-      (->> lines
-           (map (fn [[l i]]
-                  (str l "," i)))
-           (interpose "\n")
-           (apply str)
-           (write csv-path))))
+  (doseq [{:keys [Z element numeral]} (take 5 (filter #(= (:numeral %) "I") (index)))]
+    (let [home "/home/tim/src/spectra"
+          ascii-path (format "%s/%03d-%s-%s.txt" home Z element numeral)
+          lines (->> ascii-path
+                     slurp
+                     observed-lines)
+          ;; csv-path (format "%s/csv/%03d-%s-%s.csv" home Z element numeral)
+          ]
+      (pr-str (take 5 lines))
+      #_(->> lines
+             (map (fn [[l i]]
+                    (str l "," i)))
+             (interpose "\n")
+             (apply str)
+             (println)
+             #_(spit csv-path))))
+
+  (doseq [{:keys [Z element numeral]} (take 1 (filter #(= (:numeral %) "I") (index)))]
+    (let [home "/home/tim/src/spectra"
+          ascii-path (format "%s/%03d-%s-%s.txt" home Z element numeral)
+          lines (->> ascii-path
+                     slurp
+                     observed-lines)]
+      (pr-str (take 5 lines))))
 
   ;; Write lines with relative intensity into a clojure data structure
-  (with-open [w (clojure.java.io/writer "/home/tim/data.clj")]
+  (with-open [w (clojure.java.io/writer "/home/tim/data.cljdat")]
     (.write w
             (prn-str
-             (for [{:keys [Z element numeral] :as ion} (index)]
-               (let [home "/home/tim/src/nist-asd-clj/resources"
-                     ascii-path (format "%s/nist-asd-data/lines/%03d-%s-%s.txt" home Z element numeral)
+             (for [{:keys [Z element numeral] :as ion} (filter neutral? (index))]
+               (let [home "/home/tim/src/spectra"
+                     ascii-path (format "%s/%03d-%s-%s.txt" home Z element numeral)
                      lines (as-> ascii-path _
                              (slurp _)
-                             (clojure.string/split _ #",")
-                             (filter (comp not empty?) _)
-                             (map #(Double/parseDouble %) _))]
+                             (observed-lines _)
+                             (filter visible-line? _))]
                  (merge ion {:lines lines})))))))
+
+
+(defn visible-lines
+  []
+  (for [{:keys [Z element numeral] :as ion} (filter neutral? (index))]
+    (let [home "/home/tim/src/spectra"
+          ascii-path (format "%s/%03d-%s-%s.txt" home Z element numeral)
+          lines (as-> ascii-path _
+                  (slurp _)
+                  (observed-lines _)
+                  (filter visible-line? _))]
+      (merge ion {:lines lines}))))
